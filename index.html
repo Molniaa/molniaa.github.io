@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molniaa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+        body {
+            font-family: 'Source Code Pro', monospace;
+            background-color: #000;
+            color: #0F0;
+            cursor: default;
+            user-select: none;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+        .panel {
+            border-left: 2px solid;
+            padding-left: 1rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 2;
+        }
+        .panel:hover {
+            transform: translateX(5px);
+        }
+        .cyan {
+            color: #0FF;
+            border-color: #0FF;
+        }
+        .green {
+            color: #0F0;
+            border-color: #0F0;
+        }
+        .white {
+            color: #FFF;
+            border-color: #FFF;
+        }
+        .purple {
+            color: #F0F;
+            border-color: #F0F;
+        }
+        .link {
+            transition: all 0.2s;
+            text-decoration: underline;
+            position: relative;
+            z-index: 2;
+        }
+        .link:hover {
+            color: #FF0;
+            transform: scale(1.05);
+        }
+        .hidden {
+            display: none;
+        }
+        .secret {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.9);
+            padding: 2rem;
+            border: 2px solid #F0F;
+            z-index: 100;
+            max-width: 80%;
+            text-align: center;
+        }
+        .heart {
+            transition: all 0.3s;
+        }
+        .heart:hover {
+            color: #F00;
+            transform: scale(1.5);
+        }
+        .hotkey-hint {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            color: #333;
+            font-size: 0.8rem;
+            z-index: 2;
+        }
+        .footer {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            color: #333;
+            font-size: 0.8rem;
+            z-index: 2;
+        }
+        
+        /* фон */
+        #space {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            color: rgba(255,255,255,0.7);
+            font-size: 1px;
+            animation: twinkle 5s infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .moving-star {
+            position: absolute;
+            color: rgba(255,255,255,0.8);
+            font-size: 1px;
+            animation: moveStar linear infinite;
+        }
+        @keyframes moveStar {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100vw, 100vh); }
+        }
+        
+        /* лицензия */
+        .license-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .license-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .license-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 1;
+        }
+        .license-card {
+            border: 2px solid #F0F;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 2;
+            background: rgba(0,0,0,0.9);
+            box-shadow: 0 0 15px rgba(240,0,240,0.5);
+            transition: all 0.3s;
+            width: 90%;
+            max-width: 400px;
+            transform: translateY(20px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+        .license-modal.active .license-card {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .license-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .license-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: #F0F;
+        }
+        .license-title {
+            font-size: 1.5rem;
+            color: #F0F;
+        }
+        .license-field {
+            display: flex;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .license-label {
+            min-width: 120px;
+            color: #0FF;
+        }
+        .license-value {
+            color: #FFF;
+            word-break: break-all;
+        }
+        .license-stamp {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            opacity: 0.7;
+            transform: rotate(15deg);
+            transition: all 0.3s;
+            z-index: 1;
+        }
+        .license-terms {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #999;
+        }
+        .close-license {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #F0F;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 3;
+        }
+        .close-license:hover {
+            color: #FFF;
+            transform: scale(1.2);
+        }
+        
+        .domain-link {
+            color: #FFF;
+            text-decoration: underline;
+            transition: all 0.2s;
+        }
+        .domain-link:hover {
+            color: #0FF;
+        }
+        
+        /* кнопка лицензии */
+        .license-btn {
+            position: fixed;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #F0F;
+            color: #F0F;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s;
+        }
+        .license-btn:hover {
+            background: rgba(240, 0, 240, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+    </style>
+</head>
+<body class="p-4 max-w-xl mx-auto">
+    <!-- фон -->
+    <div id="space"></div>
+    
+    <!-- кнопка для открытия лицензии -->
+    <div class="license-btn" id="licenseBtn">
+        <i class="fas fa-id-card"></i>
+    </div>
+    
+    <!-- модальное окно лицензии -->
+    <div class="license-modal" id="licenseModal">
+        <div class="license-overlay" id="licenseOverlay"></div>
+        <div class="license-card">
+            <button class="close-license" id="closeLicense">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="license-header">
+                <div class="license-icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div class="license-title">NICKNAME LICENSE</div>
+            </div>
+            <div class="license-stamp">
+                <i class="fas fa-certificate"></i>
+            </div>
+            
+            <div class="license-field">
+                <div class="license-label">HOLDER:</div>
+                <div class="license-value">Molniaa</div>
+            </div>
+            <div class="license-field">
+                <div class="license-label">ISSUED:</div>
+                <div class="license-value">14-03-2022</div>
+            </div>
+            <div class="license-field">
+                <div class="license-label">EXPIRES:</div>
+                <div class="license-value">PERMANENT</div>
+            </div>
+            <div class="license-field">
+                <div class="license-label">DOMAIN:</div>
+                <div class="license-value">
+                    <a href="https://mynickname.com/Molniaa" target="_blank" class="domain-link">mynickname.com/Molniaa</a>
+                </div>
+            </div>
+            <div class="license-field">
+                <div class="license-label">STATUS:</div>
+                <div class="license-value"><span class="text-green-500">ACTIVE</span></div>
+            </div>
+            <div class="license-field">
+                <div class="license-label">TYPE:</div>
+                <div class="license-value">EXCLUSIVE</div>
+            </div>
+            
+            <div class="license-terms">
+                <p>This nickname is officially registered and protected!</p>
+                <p>Unauthorized use is prohibited. Violators will be prosecuted =Ъ</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mb-10" style="position: relative; z-index: 2;">
+        <pre class="text-2xl text-#0FF">
+  __  __       _       _             
+ |  \/  |     | |     (_)            
+ | \  / | ___ | |_ __  _  __ _  __ _ 
+ | |\/| |/ _ \| | '_ \| |/ _` |/ _` |
+ | |  | | (_) | | | | | | (_| | (_| |
+ |_|  |_|\___/|_|_| |_|_|\__,_|\__,_|
+        </pre>
+    </div>
+
+    <div class="panel cyan">
+        <pre>
+ (╯°□°)╯︵ ┻━┻ 
+ 'Блин, завал по программированию! Как вообще учиться в МАУ?!' 
+ — Molniaa
+        </pre>
+    </div>
+
+    <div class="panel green">
+        <pre>
+ (><) 
+ 'Успокойся, Molniaa, ты справишься!' 
+ — Qssent
+        </pre>
+    </div>
+
+    <div class="panel white">
+        <pre>
+ (<span class="heart">♥</span><span class="heart">♥</span>) 
+ 'Спасибо тебе... Кстати, мы теперь семья!' 
+ — Molniaa
+        </pre>
+    </div>
+
+    <div class="mt-8" style="position: relative; z-index: 2;">
+        <div class="mb-2">[<a href="https://t.me/semi_on" target="_blank" class="link">Telegram</a>] тут я чаще всего онлайн ＼(＾▽＾)／</div>
+        <div class="mb-2">[<a href="https://steamcommunity.com/id/molniykaa" target="_blank" class="link">Steam</a>] го в игру! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</div>
+        <div class="mb-2">[<a href="https://vk.com/molniaa" target="_blank" class="link">VK</a>] заглядываю иногда (－‸ლ)</div>
+        <div>[<a href="https://discordapp.com/users/453728509416964097" target="_blank" class="link">Discord</a>] пиши, но я редко тут (´･_･`)</div>
+    </div>
+
+    <div id="secret-panel" class="secret hidden">
+        <pre class="text-pink-500">
+   ____                     _   
+  / __ \                   | |  
+ | |  | |___ ___  ___ _ __ | |_ 
+ | |  | / __/ __|/ _ \ '_ \| __|
+ | |__| \__ \__ \  __/ | | | |_ 
+  \___\_\___/___/\___|_| |_|\__|
+        </pre>
+        <p class="text-white mt-4">Секретное послание: ты — мой лучший код <span class="heart">♥</span></p>
+    </div>
+
+    <div class="hotkey-hint">Alt+Shift+Q</div>
+    <div class="footer">Created in Murmansk region, 2025 | beginner programmer</div>
+
+    <script>
+        // cоздание звёздного фона
+        function createStars() {
+            const space = document.getElementById('space');
+            const starsCount = 2000;
+            const movingStarsCount = 200;
+            
+            // cтатичные мерцающие звёзды
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.innerHTML = '·';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.fontSize = `${Math.random() * 3 + 1}px`;
+                star.style.animationDuration = `${Math.random() * 5 + 3}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                space.appendChild(star);
+            }
+            
+            // движущиеся звёзды
+            for (let i = 0; i < movingStarsCount; i++) {
+                const movingStar = document.createElement('div');
+                movingStar.className = 'moving-star';
+                movingStar.innerHTML = Math.random() > 0.5 ? '·' : '˚';
+                movingStar.style.left = `${Math.random() * 100}%`;
+                movingStar.style.top = `${Math.random() * 100}%`;
+                movingStar.style.fontSize = `${Math.random() * 2 + 1}px`;
+                movingStar.style.animationDuration = `${Math.random() * 50 + 30}s`;
+                movingStar.style.animationDelay = `${Math.random() * 10}s`;
+                space.appendChild(movingStar);
+            }
+        }
+        
+        // управление модальным окном лицензии
+        function setupLicenseModal() {
+            const licenseBtn = document.getElementById('licenseBtn');
+            const licenseModal = document.getElementById('licenseModal');
+            const licenseOverlay = document.getElementById('licenseOverlay');
+            const closeLicense = document.getElementById('closeLicense');
+            
+            licenseBtn.addEventListener('click', function() {
+                licenseModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            closeLicense.addEventListener('click', function() {
+                licenseModal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+            
+            licenseOverlay.addEventListener('click', function() {
+                licenseModal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+            
+            // штамп лицензии
+            const licenseCard = document.querySelector('.license-card');
+            const licenseStamp = document.querySelector('.license-stamp');
+            
+            licenseCard.addEventListener('mouseenter', function() {
+                licenseStamp.style.transform = 'rotate(15deg) scale(1.2)';
+                licenseStamp.style.opacity = '1';
+            });
+            
+            licenseCard.addEventListener('mouseleave', function() {
+                licenseStamp.style.transform = 'rotate(15deg)';
+                licenseStamp.style.opacity = '0.7';
+            });
+        }
+        
+        // инициализация при загрузке
+        window.onload = function() {
+            createStars();
+            setupLicenseModal();
+            
+            // секретка с=
+            document.addEventListener('keydown', function(e) {
+                if (e.altKey && e.shiftKey && e.key === 'Q') {
+                    const secretPanel = document.getElementById('secret-panel');
+                    secretPanel.classList.toggle('hidden');
+                }
+            });
+
+            const thirdPanel = document.querySelectorAll('.panel')[2];
+            const hearts = document.querySelectorAll('.heart');
+            
+            thirdPanel.addEventListener('mouseenter', function() {
+                hearts.forEach(heart => {
+                    heart.textContent = '♥';
+                    heart.style.color = '#F00';
+                });
+            });
+            
+            thirdPanel.addEventListener('mouseleave', function() {
+                hearts.forEach(heart => {
+                    heart.textContent = '♥';
+                    heart.style.color = '';
+                });
+            });
+        };
+    </script>
+</body>
+</html>
