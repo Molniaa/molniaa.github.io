@@ -1,2 +1,2 @@
 # molniaa.github.io
-my site
+my site molniaa.ru
